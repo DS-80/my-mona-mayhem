@@ -385,3 +385,67 @@ header p {
   0%, 100% { transform: scale(1); }
   50%       { transform: scale(1.1); }
 }
+
+/* ── Keyboard focus ──────────────────────────────────── */
+
+#battle-btn:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 4px;
+  box-shadow: 0 0 20px var(--green-glow), 0 0 40px rgba(95, 237, 131, 0.3), inset 0 0 15px rgba(95, 237, 131, 0.1);
+}
+
+/* ── Responsive: 1024px — single-column results ──────── */
+
+@media (max-width: 1024px) {
+  #results {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .result-card {
+    min-width: auto;
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .vs-badge {
+    align-self: center;
+  }
+}
+
+/* ── Responsive: 768px — mobile layout ──────────────── */
+
+@media (max-width: 768px) {
+  html {
+    font-size: 8px;
+  }
+
+  body {
+    padding: 2rem 1rem;
+    gap: 2rem;
+  }
+
+  header h1 {
+    font-size: 2rem;
+  }
+
+  .player-inputs {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .player-group input {
+    width: 100%;
+  }
+
+  .vs-divider {
+    text-align: center;
+  }
+
+  .result-card {
+    min-width: auto;
+    width: 100%;
+    padding: 1.2rem;
+  }
+}
