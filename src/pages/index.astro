@@ -120,12 +120,41 @@
 				const p1 = p1Input.value.trim();
 				const p2 = p2Input.value.trim();
 
+				// Clear previous error state
+				errorMsg.classList.remove('shake');
 				errorMsg.style.display = 'none';
 				errorMsg.textContent = '';
+				p1Input.classList.remove('error');
+				p2Input.classList.remove('error');
 
-				if (!p1 || !p2) {
-					errorMsg.textContent = 'Enter both usernames to battle.';
+				// GitHub username: 1–39 chars, alphanumeric or hyphens, no leading/trailing hyphen
+				const validUsername = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/;
+
+				let errorText = '';
+				if (!p1 && !p2) {
+					p1Input.classList.add('error');
+					p2Input.classList.add('error');
+					errorText = 'Enter both usernames to battle.';
+				} else if (!p1) {
+					p1Input.classList.add('error');
+					errorText = 'Player 1 username is required.';
+				} else if (!p2) {
+					p2Input.classList.add('error');
+					errorText = 'Player 2 username is required.';
+				} else if (!validUsername.test(p1)) {
+					p1Input.classList.add('error');
+					errorText = `"${p1}" is not a valid GitHub username.`;
+				} else if (!validUsername.test(p2)) {
+					p2Input.classList.add('error');
+					errorText = `"${p2}" is not a valid GitHub username.`;
+				}
+
+				if (errorText) {
+					errorMsg.textContent = errorText;
 					errorMsg.style.display = 'block';
+					// Re-trigger shake by removing/re-adding the class
+					void errorMsg.offsetWidth;
+					errorMsg.classList.add('shake');
 					return;
 				}
 
@@ -149,6 +178,9 @@
 					const message = err instanceof Error ? err.message : 'Something went wrong.';
 					errorMsg.textContent = message;
 					errorMsg.style.display = 'block';
+					errorMsg.classList.remove('shake');
+					void errorMsg.offsetWidth;
+					errorMsg.classList.add('shake');
 				} finally {
 					battleBtn.disabled = false;
 					battleBtn.textContent = '⚔ Battle';
@@ -158,6 +190,8 @@
 			battleBtn.addEventListener('click', battle);
 			p1Input.addEventListener('keydown', (e) => { if (e.key === 'Enter') battle(); });
 			p2Input.addEventListener('keydown', (e) => { if (e.key === 'Enter') battle(); });
+			p1Input.addEventListener('input', () => { p1Input.classList.remove('error'); });
+			p2Input.addEventListener('input', () => { p2Input.classList.remove('error'); });
 		</script>
 	</body>
 </html>
