@@ -426,6 +426,108 @@ header p {
   100% { transform: translateY(0)    rotate(-12deg) scale(1); }
 }
 
+/* ── Winner Banner ───────────────────────────────────── */
+
+#winner-banner {
+  flex-basis: 100%;
+  width: 100%;
+  text-align: center;
+  font-size: 1.6rem;
+  padding: 2rem 3rem;
+  border: 3px solid transparent;
+  background: var(--surface);
+  line-height: 2;
+  letter-spacing: 0.04em;
+  position: relative;
+  overflow: hidden;
+  display: none;
+}
+
+/* shimmer sweep on banner */
+#winner-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.07) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+#winner-banner.winner {
+  display: block;
+  color: var(--green);
+  border-color: var(--green);
+  text-shadow:
+    0 0 10px var(--green),
+    0 0 25px var(--green-glow),
+    0 0 50px var(--green-dim);
+  box-shadow:
+    0 0 20px var(--green-glow),
+    0 0 40px var(--green-glow-30),
+    inset 0 0 30px var(--green-subtle);
+  animation:
+    banner-enter 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
+    winner-glow-pulse 2s ease-in-out 0.5s infinite alternate,
+    elec-flicker 5s steps(1) 1.5s infinite;
+}
+
+#winner-banner.tie {
+  display: block;
+  color: var(--purple);
+  border-color: var(--purple);
+  text-shadow:
+    0 0 10px var(--purple),
+    0 0 25px var(--purple-glow),
+    0 0 50px rgba(138, 43, 226, 0.4);
+  box-shadow:
+    0 0 20px var(--purple-glow),
+    0 0 40px rgba(138, 43, 226, 0.3),
+    inset 0 0 30px rgba(138, 43, 226, 0.1);
+  animation:
+    banner-enter 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
+    tie-pulse 1.5s ease-in-out 0.5s infinite;
+}
+
+@keyframes banner-enter {
+  0%   { opacity: 0; transform: translateY(-30px) scale(0.88); }
+  100% { opacity: 1; transform: translateY(0)     scale(1); }
+}
+
+@keyframes winner-glow-pulse {
+  0% {
+    text-shadow:
+      0 0 10px var(--green),
+      0 0 25px var(--green-glow),
+      0 0 50px var(--green-dim);
+    box-shadow:
+      0 0 20px var(--green-glow),
+      0 0 40px var(--green-glow-30),
+      inset 0 0 30px var(--green-subtle);
+  }
+  100% {
+    text-shadow:
+      0 0 20px var(--green),
+      0 0 50px var(--green-glow),
+      0 0 80px var(--green-glow-30),
+      0 0 120px var(--green-dim);
+    box-shadow:
+      0 0 40px var(--green-glow),
+      0 0 80px var(--green-glow-30),
+      inset 0 0 50px var(--green-subtle);
+  }
+}
+
+@keyframes tie-pulse {
+  0%, 100% { transform: scale(1);    opacity: 0.9; }
+  50%       { transform: scale(1.02); opacity: 1; }
+}
+
 /* ── VS badge ────────────────────────────────────────── */
 
 .vs-badge {

@@ -42,6 +42,8 @@
 			<p id="error-msg"></p>
 
 			<div id="results">
+				<div id="winner-banner" aria-live="polite"></div>
+
 				<div class="result-card" id="player1-result">
 					<p class="username"></p>
 					<p class="stats"></p>
@@ -90,6 +92,7 @@
 			const battleBtn = document.getElementById('battle-btn') as HTMLButtonElement;
 			const errorMsg = document.getElementById('error-msg') as HTMLParagraphElement;
 			const results = document.getElementById('results') as HTMLDivElement;
+			const winnerBanner = document.getElementById('winner-banner') as HTMLDivElement;
 
 			async function fetchContribs(username: string): Promise<ContributionData> {
 				const res = await fetch(`/api/contributions/${encodeURIComponent(username)}`);
@@ -122,12 +125,14 @@
 				const p1 = p1Input.value.trim();
 				const p2 = p2Input.value.trim();
 
-				// Clear previous error state
+				// Clear previous state
 				errorMsg.classList.remove('shake');
 				errorMsg.style.display = 'none';
 				errorMsg.textContent = '';
 				p1Input.classList.remove('error');
 				p2Input.classList.remove('error');
+				winnerBanner.className = '';
+				winnerBanner.textContent = '';
 
 				// GitHub username: 1–39 chars, alphanumeric or hyphens, no leading/trailing hyphen
 				const validUsername = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/;
@@ -173,6 +178,18 @@
 					const card2 = document.getElementById('player2-result')!;
 					card1.querySelector('.unicorn')!.classList.toggle('winner', d1.total_contributions >= d2.total_contributions);
 					card2.querySelector('.unicorn')!.classList.toggle('winner', d2.total_contributions >= d1.total_contributions);
+
+					// Show winner banner
+					if (d1.total_contributions > d2.total_contributions) {
+						winnerBanner.textContent = `🏆 ${p1} WINS! 🏆`;
+						winnerBanner.className = 'winner';
+					} else if (d2.total_contributions > d1.total_contributions) {
+						winnerBanner.textContent = `🏆 ${p2} WINS! 🏆`;
+						winnerBanner.className = 'winner';
+					} else {
+						winnerBanner.textContent = `🤝 IT'S A TIE! 🤝`;
+						winnerBanner.className = 'tie';
+					}
 
 					results.style.display = 'flex';
 					results.scrollIntoView({ behavior: 'smooth', block: 'start' });
