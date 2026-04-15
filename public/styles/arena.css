@@ -15,6 +15,8 @@
   --purple: #8a2be2;
   --purple-glow: rgba(138, 43, 226, 0.6);
   --green-glow: rgba(95, 237, 131, 0.6);
+  --red: #ff3366;
+  --red-glow: rgba(255, 51, 102, 0.6);
 }
 
 *,
@@ -242,10 +244,37 @@ header p {
 
 #error-msg {
   display: none;
-  color: #f85149;
+  color: var(--red);
   font-size: 0.85rem;
   text-align: center;
   line-height: 1.8;
+  text-shadow:
+    0 0 6px var(--red),
+    0 0 14px var(--red-glow),
+    0 0 28px rgba(255, 51, 102, 0.3);
+}
+
+#error-msg.shake {
+  animation: shake 0.45s steps(10) forwards;
+}
+
+@keyframes shake {
+  0%   { transform: translateX(0); }
+  10%  { transform: translateX(-8px); }
+  20%  { transform: translateX(8px); }
+  30%  { transform: translateX(-6px); }
+  40%  { transform: translateX(6px); }
+  50%  { transform: translateX(-4px); }
+  60%  { transform: translateX(4px); }
+  70%  { transform: translateX(-2px); }
+  80%  { transform: translateX(2px); }
+  90%  { transform: translateX(-1px); }
+  100% { transform: translateX(0); }
+}
+
+.player-group input.error {
+  border-color: var(--red);
+  box-shadow: 0 0 8px var(--red-glow), 0 0 20px rgba(255, 51, 102, 0.15);
 }
 
 /* ── Results ─────────────────────────────────────────── */
