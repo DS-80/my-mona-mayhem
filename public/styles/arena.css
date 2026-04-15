@@ -13,6 +13,7 @@
   --border: #1e1e3f;
   --text: #e6edf3;
   --text-muted: #7a8499;
+  --brown: #c4a882;
   --green: #5fed83;
   --green-hover: #7fff9f;
   --purple: #8a2be2;
@@ -36,6 +37,7 @@
   --level-2-glow: rgba(10, 75, 127, 0.8);
   --level-3-glow: rgba(0, 144, 191, 0.8);
 
+  --brown: #c4a882;
   --green: #00f5ff;
   --green-hover: #7fffff;
   --purple: #ff6b35;
@@ -336,7 +338,7 @@ header p {
 
 .result-card .stats {
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: var(--brown);
   line-height: 2;
 }
 
