@@ -9,9 +9,155 @@
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Mona Mayhem</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+		<link rel="stylesheet" href="/styles/arena.css" />
 	</head>
 	<body>
-		<h1>Mona Mayhem</h1>
-		<p>Welcome to Mona Mayhem! Time to build a GitHub Contribution Battle Arena.</p>
+		<header>
+			<h1>Mona Mayhem</h1>
+			<p>GitHub Contribution Battle Arena</p>
+		</header>
+
+		<main class="arena">
+			<div class="player-inputs">
+				<div class="player-group">
+					<label for="p1">Player 1</label>
+					<input id="p1" type="text" placeholder="github username" autocomplete="off" spellcheck="false" />
+				</div>
+
+				<span class="vs-divider">VS</span>
+
+				<div class="player-group">
+					<label for="p2">Player 2</label>
+					<input id="p2" type="text" placeholder="github username" autocomplete="off" spellcheck="false" />
+				</div>
+			</div>
+
+			<button id="battle-btn" type="button">⚔ Battle</button>
+
+			<p id="error-msg"></p>
+
+			<div id="results">
+				<div class="result-card" id="player1-result">
+					<p class="username"></p>
+					<p class="stats"></p>
+					<div class="grid"></div>
+					<div class="unicorn" aria-hidden="true">🦄</div>
+				</div>
+
+				<span class="vs-badge">VS</span>
+
+				<div class="result-card" id="player2-result">
+					<p class="username"></p>
+					<p class="stats"></p>
+					<div class="grid"></div>
+					<div class="unicorn" aria-hidden="true">🦄</div>
+				</div>
+			</div>
+		</main>
+
+		<script>
+			interface ContributionDay {
+				weekday: number;
+				count: number;
+				level: 0 | 1 | 2 | 3 | 4;
+			}
+
+			interface ContributionWeek {
+				index: number;
+				first_day: string;
+				contribution_days: ContributionDay[];
+			}
+
+			interface ContributionData {
+				schema: string;
+				generated_at: string;
+				from: string;
+				to: string;
+				range_days: number;
+				total_contributions: number;
+				private_contributions_included: boolean;
+				colors_full: string[];
+				weeks: ContributionWeek[];
+			}
+
+			const p1Input = document.getElementById('p1') as HTMLInputElement;
+			const p2Input = document.getElementById('p2') as HTMLInputElement;
+			const battleBtn = document.getElementById('battle-btn') as HTMLButtonElement;
+			const errorMsg = document.getElementById('error-msg') as HTMLParagraphElement;
+			const results = document.getElementById('results') as HTMLDivElement;
+
+			async function fetchContribs(username: string): Promise<ContributionData> {
+				const res = await fetch(`/api/contributions/${encodeURIComponent(username)}`);
+				const data = await res.json();
+				if (!res.ok) throw new Error(data.error ?? 'Unknown error');
+				return data as ContributionData;
+			}
+
+			function renderResult(data: ContributionData, cardId: string, username: string): void {
+				const card = document.getElementById(cardId)!;
+				card.querySelector('.username')!.textContent = username;
+				card.querySelector('.stats')!.textContent =
+					`${data.total_contributions.toLocaleString()} contributions  ·  ${data.from} → ${data.to}`;
+
+				const grid = card.querySelector('.grid')!;
+				grid.innerHTML = '';
+
+				for (const week of data.weeks) {
+					for (const day of week.contribution_days) {
+						const sq = document.createElement('div');
+						sq.className = 'day';
+						sq.dataset.level = String(day.level);
+						sq.title = `${week.first_day} +${day.weekday}d: ${day.count} contributions`;
+						grid.appendChild(sq);
+					}
+				}
+			}
+
+			async function battle(): Promise<void> {
+				const p1 = p1Input.value.trim();
+				const p2 = p2Input.value.trim();
+
+				errorMsg.style.display = 'none';
+				errorMsg.textContent = '';
+
+				if (!p1 || !p2) {
+					errorMsg.textContent = 'Enter both usernames to battle.';
+					errorMsg.style.display = 'block';
+					return;
+				}
+
+				battleBtn.disabled = true;
+				battleBtn.textContent = 'LOADING…';
+
+				try {
+					const [d1, d2] = await Promise.all([fetchContribs(p1), fetchContribs(p2)]);
+					renderResult(d1, 'player1-result', p1);
+					renderResult(d2, 'player2-result', p2);
+
+					// Show unicorn only on the winner's card (tie = both win)
+					const card1 = document.getElementById('player1-result')!;
+					const card2 = document.getElementById('player2-result')!;
+					card1.querySelector('.unicorn')!.classList.toggle('winner', d1.total_contributions >= d2.total_contributions);
+					card2.querySelector('.unicorn')!.classList.toggle('winner', d2.total_contributions >= d1.total_contributions);
+
+					results.style.display = 'flex';
+					results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				} catch (err) {
+					const message = err instanceof Error ? err.message : 'Something went wrong.';
+					errorMsg.textContent = message;
+					errorMsg.style.display = 'block';
+				} finally {
+					battleBtn.disabled = false;
+					battleBtn.textContent = '⚔ Battle';
+				}
+			}
+
+			battleBtn.addEventListener('click', battle);
+			p1Input.addEventListener('keydown', (e) => { if (e.key === 'Enter') battle(); });
+			p2Input.addEventListener('keydown', (e) => { if (e.key === 'Enter') battle(); });
+		</script>
 	</body>
 </html>
